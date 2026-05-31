@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>享翼 - 低空经济无人机服务平台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <style>
+        /* ================= 全局与品牌风格 ================= */
+        :root {
+            --primary-orange: #ff6b35;
+            --primary-blue: #007bff;
+            --text-dark: #2c3e50;
+            --text-medium: #666;
+            --bg-light: #f5f7fa;
+            --border-radius: 8px;
+            --border-radius-large: 12px;
+            --shadow-light: 0 4px 15px rgba(0,0,0,0.03);
+            --zhima-blue: #1677ff; 
+        }
+        
+        body { margin: 0; font-family: 'Inter', sans-serif; background-color: var(--bg-light); color: var(--text-dark); }
+        button { border: none; padding: 10px 18px; border-radius: var(--border-radius); cursor: pointer; font-weight: bold; transition: all 0.2s; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-primary { background: var(--primary-blue); color: white; }
+        .btn-orange { background: var(--primary-orange); color: white; }
+        .btn-secondary { background: #f0f0f0; color: #333; }
+        .btn-success { background: #4caf50; color: white; }
+        .btn-zhima { background: var(--zhima-blue); color: white; }
+
+        /* ================= 顶部导航 ================= */
+        .header { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        .header-container { display: flex; justify-content: space-between; align-items: center; padding: 0 30px; max-width: 1200px; margin: 0 auto; height: 70px; }
+        
+        .brand-button { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .la-avatar { width: 38px; height: 38px; background: #2c3e50; color: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(44,62,80,0.2); }
+        .brand-text { font-size: 22px; font-weight: 700; color: #2c3e50; letter-spacing: -0.5px; }
+        
+        .nav-container { display: flex; gap: 25px; }
+        .nav-item { cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 15px; color: var(--text-medium); padding: 10px 0; border-bottom: 3px solid transparent; transition: all 0.3s; font-weight: 500; }
+        .nav-item:hover, .nav-item.active { color: var(--primary-orange); border-bottom-color: var(--primary-orange); }
+        
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        .credit-badge { display: flex; align-items: center; gap: 6px; background: rgba(22, 119, 255, 0.1); color: var(--zhima-blue); padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .cart-icon-btn { background: #fff5f0; color: var(--primary-orange); padding: 8px 16px; border-radius: 20px; display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; }
+
+        /* ================= 主体布局 ================= */
+        .main-content { max-width: 1200px; margin: 30px auto; padding: 0 20px; min-height: 70vh; }
+        .content-section { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ================= 低空探索板块 ================= */
+        .hero-banner { background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white; padding: 40px; border-radius: var(--border-radius-large); margin-bottom: 30px; box-shadow: 0 10px 20px rgba(52,152,219,0.2); }
+        .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
+        .news-card { background: white; border-radius: var(--border-radius); padding: 25px; box-shadow: var(--shadow-light); cursor: pointer; border: 1px solid #eaeaea; transition: transform 0.2s; }
+        .news-card:hover { transform: translateY(-5px); border-color: var(--primary-orange); box-shadow: 0 10px 25px rgba(255,107,53,0.1); }
+        .news-tag { background: #fff5f0; color: var(--primary-orange); font-size: 12px; padding: 5px 10px; border-radius: 4px; display: inline-block; margin-bottom: 12px; font-weight: 600; }
+        
+        .article-content h1 { font-size: 22px; color: #2c3e50; border-bottom: 2px solid #f0f0f0; padding-bottom: 12px; margin-top: 0; }
+        .article-content p { font-size: 15px; line-height: 1.8; color: #444; }
+        .article-content blockquote { border-left: 4px solid var(--primary-orange); background: #fff5f0; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0; color: #e65100; font-weight: 600; }
+
+        /* ================= 共享平台板块 ================= */
+        .share-tabs { display: flex; gap: 15px; margin-bottom: 25px; border-bottom: 2px solid #eaeaea; padding-bottom: 15px; }
+        .share-tab-btn { background: none; border: none; font-size: 18px; color: var(--text-medium); padding: 5px 10px; border-radius: 0; }
+        .share-tab-btn.active { color: var(--primary-blue); border-bottom: 3px solid var(--primary-blue); font-weight: 700; }
+        
+        .share-layout { display: grid; grid-template-columns: 320px 1fr; gap: 30px; }
+        .publish-box { background: white; padding: 25px; border-radius: var(--border-radius-large); box-shadow: var(--shadow-light); border: 1px solid #eaeaea; height: fit-content; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
+        .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: var(--border-radius); box-sizing: border-box; font-family: inherit; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--primary-orange); }
+        
+        .post-list { display: flex; flex-direction: column; gap: 20px; }
+        .post-card { background: white; padding: 25px; border-radius: var(--border-radius-large); box-shadow: var(--shadow-light); border: 1px solid #eaeaea; text-align: left; transition: transform 0.2s; }
+        .post-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+        .post-header { display: flex; justify-content: space-between; color: var(--text-medium); font-size: 13px; margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; }
+        .action-btn { background: none; padding: 0; color: var(--text-medium); display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 500; }
+        .action-btn.liked { color: #e91e63; font-weight: bold; }
+        
+        .lease-price-tag { background: #fff3e0; color: #e65100; font-size: 20px; font-weight: 700; padding: 8px 15px; border-radius: 8px; display: inline-block; margin-bottom: 15px; border: 1px solid #ffe0b2; }
+        .lease-meta { display: flex; gap: 15px; font-size: 13px; color: #555; margin-bottom: 15px; flex-wrap: wrap; }
+        .lease-meta span { display: flex; align-items: center; gap: 5px; background: #f5f7fa; padding: 5px 10px; border-radius: 4px; }
+        .status-badge { color: #4caf50; font-weight: 600; border: 1px solid #4caf50; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
+        .status-badge.blue { color: var(--zhima-blue); border-color: var(--zhima-blue); }
+
+        /* ================= 空中商场板块 ================= */
+        .store-filter { display: flex; gap: 15px; margin-bottom: 25px; }
+        .filter-btn { background: white; border: 1px solid #ddd; padding: 8px 18px; border-radius: 20px; color: #555; }
+        .filter-btn.active { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 25px; }
+        .product-card { background: white; border-radius: var(--border-radius-large); overflow: hidden; box-shadow: var(--shadow-light); border: 1px solid #eaeaea; display: flex; flex-direction: column; }
+        .product-img-mock { height: 160px; background: #eaedf2; display: flex; align-items: center; justify-content: center; font-size: 50px; color: #b0bec5; }
+        .product-info { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; text-align: left; }
+        .product-price { font-size: 22px; font-weight: 700; color: var(--primary-orange); }
+        .product-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
+
+        /* ================= FPV技术支持板块 ================= */
+        .fpv-header { margin-bottom: 25px; }
+        .fpv-header h2 { margin: 0 0 10px; font-size: 28px; }
+        .ws-status-bar { display: inline-flex; align-items: center; gap: 10px; padding: 8px 16px; background: #e8f5e9; color: #2e7d32; border-radius: 20px; font-size: 14px; margin-bottom: 20px;}
+        .status-dot { width: 8px; height: 8px; background-color: #4caf50; border-radius: 50%; box-shadow: 0 0 8px #4caf50; animation: pulse 1.5s infinite; }
+        .fpv-bento-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
+        .fpv-card { background: #fff; padding: 25px; border-radius: 12px; box-shadow: var(--shadow-light); border: 1px solid #eaeaea; }
+        .mock-map-container { height: 200px; background: #1e1e1e; border-radius: 8px; position: relative; overflow: hidden; margin-bottom: 15px; border: 2px solid #333; }
+        .mock-drone-node { width: 14px; height: 14px; background: #00ff00; border-radius: 50%; position: absolute; box-shadow: 0 0 15px #00ff00; }
+        .airspace-overlay { position: absolute; bottom: 10px; left: 10px; color: #00ff00; font-size: 12px; background: rgba(0,0,0,0.8); padding: 4px 8px; border-radius: 4px; font-family: monospace; }
+        .tuning-sliders { display: flex; flex-direction: column; gap: 18px; margin-bottom: 20px;}
+        .slider-group label { display: flex; justify-content: space-between; font-weight: 600; color: #444; font-size: 14px;}
+        .pid-slider { width: 100%; accent-color: var(--primary-blue); margin-top: 8px; }
+        pre { background: #1e1e1e; color: #a9fe34; padding: 18px; border-radius: 8px; overflow-x: auto; font-family: monospace; font-size: 13px; border: 1px solid #333; text-align: left; }
+        .ai-box { background: rgba(0, 123, 255, 0.05); border-left: 4px solid var(--primary-blue); padding: 15px; border-radius: 0 8px 8px 0; margin-bottom: 15px; text-align: left; }
+
+        /* ================= 弹窗系统与芝麻信用专属样式 ================= */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(3px); }
+        .modal-content { background: white; padding: 35px; border-radius: var(--border-radius-large); max-width: 650px; width: 90%; text-align: left; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .cart-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px dashed #eee; font-size: 15px; }
+        
+        .credit-score-circle { width: 150px; height: 150px; margin: 20px auto; border-radius: 50%; border: 8px solid #e0e0e0; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .credit-score-circle.excellent { border-color: #4caf50; box-shadow: 0 0 20px rgba(76,175,80,0.3); }
+        .score-number { font-size: 40px; font-weight: 800; color: #4caf50; line-height: 1; }
+        .score-text { font-size: 14px; font-weight: 600; color: #666; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <div class="header-container">
+                <div class="brand-button" @click="activeTab = 'home'">
+                    <div class="la-avatar">L&A</div>
+                    <span class="brand-text">享翼</span>
+                </div>
+                
+                <nav class="main-nav">
+                    <div class="nav-container">
+                        <div v-for="tab in tabs" :key="tab.id" :class="['nav-item', { active: activeTab === tab.id }]" @click="activeTab = tab.id">
+                            <i :class="tab.icon"></i><span>{{ tab.name }}</span>
+                        </div>
+                    </div>
+                </nav>
+                
+                <div class="header-right">
+                    <div v-if="creditScore > 0" class="credit-badge">
+                        <i class="fas fa-shield-alt"></i> 芝麻分 {{ creditScore }} 极好
+                    </div>
+                    <div v-else class="credit-badge" style="color: #999; background: #f0f0f0;" @click="triggerCreditAuth('manual')">
+                        <i class="fas fa-user-shield"></i> 未授权信用
+                    </div>
+
+                    <div class="cart-icon-btn" @click="showCartModal = true">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>购物车 ({{ cart.length }})</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            
+            <section v-show="activeTab === 'home'" class="content-section">
+                <div class="hero-banner">
+                    <h1 style="margin: 0 0 10px 0; font-size: 34px;">低空探索：搞懂新质生产力</h1>
+                    <p style="margin: 0; font-size: 16px; opacity: 0.9;">拒绝晦涩红头文件！专为中国低空经济 B 端从业者与大一统市场打造的垂直信息门户。</p>
+                </div>
+                <h2 style="font-size: 22px; margin-bottom: 20px; color: #2c3e50;"><i class="fas fa-fire" style="color:var(--primary-orange)"></i> 最新前沿探索</h2>
+                <div class="news-grid">
+                    <div v-for="article in articles" :key="article.id" class="news-card" @click="openArticle(article)">
+                        <span class="news-tag">{{ article.tag }}</span>
+                        <h3 style="margin: 0 0 10px 0; font-size: 19px; color: #2c3e50;">{{ article.title }}</h3>
+                        <p style="margin: 0; color: #666; font-size: 14px; line-height: 1.6;">{{ article.summary }}</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section v-show="activeTab === 'share'" class="content-section">
+                <div class="share-tabs">
+                    <button :class="['share-tab-btn', { active: activeShareTab === 'discuss' }]" @click="activeShareTab = 'discuss'">
+                        <i class="fas fa-comments"></i> 圈内探讨
+                    </button>
+                    <button :class="['share-tab-btn', { active: activeShareTab === 'lease' }]" @click="activeShareTab = 'lease'">
+                        <i class="fas fa-exchange-alt"></i> 闲置设备租赁
+                    </button>
+                </div>
+
+                <div v-show="activeShareTab === 'discuss'" class="share-layout">
+                    <div class="publish-box">
+                        <h3 style="margin-top:0; color:#2c3e50;"><i class="fas fa-pen-nib" style="color:var(--primary-orange)"></i> 发起探讨</h3>
+                        <div class="form-group"><label>探讨主题</label><input type="text" v-model="newPost.title" placeholder="输入技术瓶颈或业务想法..."></div>
+                        <div class="form-group"><label>内容详情</label><textarea rows="5" v-model="newPost.content" placeholder="分享你的干货..."></textarea></div>
+                        <button class="btn-orange" style="width:100%" @click="submitPost">即时发布至平台</button>
+                    </div>
+                    <div class="post-list">
+                        <div v-for="post in postList" :key="post.id" class="post-card">
+                            <div class="post-header">
+                                <span><i class="fas fa-user-circle" style="color: var(--primary-blue);"></i> {{ post.author }}</span>
+                                <span><i class="far fa-clock"></i> {{ post.time }}</span>
+                            </div>
+                            <h3 style="margin: 0 0 10px 0; font-size: 20px;">{{ post.title }}</h3>
+                            <p style="color: #444; line-height: 1.7; font-size: 15px; margin-bottom: 20px;">{{ post.content }}</p>
+                            <div style="display: flex; gap: 20px;">
+                                <button :class="['action-btn', { liked: post.isLiked }]" @click="toggleLike(post)">
+                                    <i class="fas fa-thumbs-up"></i> 觉得够干货 ({{ post.likes }})
+                                </button>
+                                <button class="action-btn"><i class="fas fa-comment-dots"></i> 参与讨论</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-show="activeShareTab === 'lease'" class="share-layout">
+                    <div class="publish-box">
+                        <h3 style="margin-top:0; color:#2c3e50;"><i class="fas fa-handshake" style="color:var(--primary-blue)"></i> 发布闲置收租</h3>
+                        <div class="form-group"><label>设备型号</label><input type="text" v-model="newLease.device" placeholder="例如：大疆 M300 RTK"></div>
+                        <div class="form-group"><label>租金预期 (元/天)</label><input type="text" v-model="newLease.price" placeholder="例如：800"></div>
+                        <div class="form-group"><label>所在区域 (LBS定位)</label><input type="text" v-model="newLease.location" placeholder="例如：杭州市 西湖区"></div>
+                        <button class="btn-primary" style="width:100%" @click="checkCreditBeforeAction('publishLease')">上架共享资产</button>
+                    </div>
+                    <div class="post-list">
+                        <div v-for="lease in leaseList" :key="lease.id" class="post-card">
+                            <div class="post-header">
+                                <span style="display:flex; align-items:center; gap:8px;">
+                                    <i class="fas fa-id-badge" style="color: #4caf50;"></i> 实名机主：{{ lease.owner }}
+                                    <span v-if="lease.credit" class="status-badge blue"><i class="fab fa-alipay"></i> 芝麻信用极好</span>
+                                </span>
+                                <span class="status-badge"><i class="fas fa-check-circle"></i> {{ lease.status }}</span>
+                            </div>
+                            <h3 style="margin: 0 0 10px 0; font-size: 20px;">{{ lease.device }}</h3>
+                            <div class="lease-price-tag">{{ lease.price }} <span style="font-size:12px; font-weight:normal; color:#666;">(信用达标可免押)</span></div>
+                            <p style="color: #444; font-size: 14px; margin-bottom: 15px;">{{ lease.title }}</p>
+                            <div class="lease-meta">
+                                <span><i class="fas fa-map-marker-alt" style="color:var(--primary-blue)"></i> {{ lease.location }}</span>
+                                <span v-for="tag in lease.tags" :key="tag"><i class="fas fa-tag" style="color:var(--primary-orange)"></i> {{ tag }}</span>
+                            </div>
+                            <div style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 5px;">
+                                <button class="btn-success" @click="checkCreditBeforeAction('rentDevice', lease.device)">
+                                    <i class="fas fa-shield-alt"></i> 信用免押免保租赁
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section v-show="activeTab === 'store'" class="content-section">
+                <div class="store-filter">
+                    <button v-for="cat in categories" :class="['filter-btn', { active: selectedCategory === cat }]" @click="selectedCategory = cat">
+                        {{ cat }}
+                    </button>
+                </div>
+                <div class="product-grid">
+                    <div v-for="prod in filteredProducts" :key="prod.id" class="product-card">
+                        <div class="product-img-mock"><i :class="prod.icon"></i></div>
+                        <div class="product-info">
+                            <h3 style="margin: 0 0 8px 0; font-size: 18px;">{{ prod.name }}</h3>
+                            <p style="font-size: 13px; color: #777; margin-bottom: 15px; flex-grow: 1;">{{ prod.desc }}</p>
+                            <div class="product-footer">
+                                <span class="product-price">￥{{ prod.price }}</span>
+                                <button class="btn-primary" style="padding: 8px 12px; font-size: 13px;" @click="addToCart(prod)"><i class="fas fa-cart-plus"></i> 加入采购</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section v-show="activeTab === 'fpv'" class="content-section">
+                <div class="fpv-header">
+                    <h2>FPV技术支持控制台</h2>
+                    <p style="color: #666;">专属第一人称视角飞手的底层数据支持平台，融合智能算法排障与空域监视</p>
+                    <div class="ws-status-bar">
+                        <span class="status-dot"></span>
+                        <span style="font-weight: 600;">WebSocket 链路：终端遥测流安全握手完毕</span>
+                    </div>
+                </div>
+                
+                <div class="fpv-bento-grid">
+                    <div class="fpv-card">
+                        <h3><i class="fas fa-satellite-dish" style="color:var(--primary-orange)"></i> 空域实时轨迹视窗</h3>
+                        <div class="mock-map-container">
+                            <div class="mock-drone-node" :style="{ left: dronePos.x + 'px', top: dronePos.y + 'px' }"></div>
+                            <div class="airspace-overlay">SYS: 10Hz GPS Data Tracking Active</div>
+                        </div>
+                        <button class="btn-primary" style="width:100%" @click="alertMsg('Map API 已成功锚定设备通信频段！')">锁定追踪设备频段</button>
+                    </div>
+
+                    <div class="fpv-card">
+                        <h3><i class="fas fa-sliders-h" style="color:var(--primary-blue)"></i> 飞控底层 PID 调参</h3>
+                        <div class="tuning-sliders">
+                            <div class="slider-group">
+                                <label><span>Roll (横滚) - P项增益</span> <span style="color:var(--primary-orange)">{{ pid.rollP }}</span></label>
+                                <input type="range" min="10" max="100" v-model="pid.rollP" class="pid-slider">
+                            </div>
+                            <div class="slider-group">
+                                <label><span>Pitch (俯仰) - I项增益</span> <span style="color:var(--primary-blue)">{{ pid.pitchI }}</span></label>
+                                <input type="range" min="10" max="100" v-model="pid.pitchI" class="pid-slider">
+                            </div>
+                        </div>
+                        <button class="btn-orange" style="width:100%" @click="alertMsg('调参指令已通过安全 JWT 封包写入系统 ROM！')">写入底层固件</button>
+                    </div>
+
+                    <div class="fpv-card">
+                        <h3><i class="fas fa-terminal" style="color:#2c3e50"></i> CLI 专家配置代码流</h3>
+                        <pre># FPV Master Configuration
+set pid_roll_p = {{ pid.rollP }}
+set pid_pitch_i = {{ pid.pitchI }}
+set max_rate_dps = 800
+set rc_expo = 0.15
+save</pre>
+                        <button class="btn-secondary" style="width:100%; margin-top:10px;" @click="alertMsg('CLI 参数配置码已成功复制！可以直接粘入 Betaflight。')">一键复制 CLI 代码</button>
+                    </div>
+
+                    <div class="fpv-card">
+                        <h3><i class="fas fa-microchip" style="color:var(--primary-blue)"></i> 黑盒日志智能解算</h3>
+                        <div class="ai-box">
+                            <p style="margin:0; font-size:14px; color:#0d47a1; line-height: 1.6;">
+                                <strong>核心诊断：</strong>当前机体横滚轴 P增益为 <span style="font-weight:bold; color:red;">{{ pid.rollP }}</span>。算法检测到电机输出在剧烈打杆时存在细微毛刺波形，建议根据手感微调该值以保证滤除高频抖动。
+                            </p>
+                        </div>
+                        <button class="btn-primary" style="width:100%" @click="alertMsg('滤波算法启动... 异常震颤信号隔离完成！')">执行深度降噪</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <div v-if="showCreditModal" class="modal-overlay" @click.self="showCreditModal = false">
+            <div class="modal-content" style="text-align: center; max-width: 450px;">
+                <h2 style="margin-top:0; color: var(--zhima-blue); font-size: 24px;">
+                    <i class="fab fa-alipay"></i> 芝麻信用授权认证
+                </h2>
+                
+                <div v-if="creditStatus === 'idle'">
+                    <i class="fas fa-shield-alt" style="font-size: 60px; color: #ccc; margin: 20px 0;"></i>
+                    <p style="color: #666; line-height: 1.6; font-size: 15px; margin-bottom: 25px;">
+                        为保障高价值工业级无人机资产的安全流转，<br>平台需查验您的芝麻信用分。<br><strong style="color:#ff6b35">分数≥650分，即可享受免押金租赁特权！</strong>
+                    </p>
+                    <button class="btn-zhima" style="width:100%; font-size: 16px; padding: 12px;" @click="startCreditAuth">同意协议并一键拉取芝麻分</button>
+                    <p style="font-size: 12px; color: #999; margin-top: 15px;">本服务由支付宝开放平台提供底层接口支持</p>
+                </div>
+
+                <div v-if="creditStatus === 'loading'" style="padding: 30px 0;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 50px; color: var(--zhima-blue); margin-bottom: 20px;"></i>
+                    <p style="color: #666; font-weight: 500;">正在安全连线支付宝风控大脑，综合评估您的履约能力...</p>
+                </div>
+
+                <div v-if="creditStatus === 'success'">
+                    <div class="credit-score-circle excellent">
+                        <span class="score-number">780</span>
+                        <span class="score-text">极好</span>
+                    </div>
+                    <p style="color: #4caf50; font-weight: 600; font-size: 16px;">认证通过！您的信用堪称楷模。</p>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 25px;">已为您开通全平台硬件设备 <strong>0押金</strong> 租赁特权！</p>
+                    <button class="btn-primary" style="width:100%; font-size: 16px;" @click="resumePendingAction">完成授权，继续操作</button>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="currentArticle" class="modal-overlay" @click.self="currentArticle = null">
+            <div class="modal-content">
+                <span class="news-tag" style="margin-bottom: 15px;">{{ currentArticle.tag }}</span>
+                <div class="article-content" v-html="currentArticle.content"></div>
+                <div style="margin-top: 35px; padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: center; border: 1px solid #eaeaea;">
+                    <p style="margin: 0 0 8px 0; font-weight: 700; color: #2c3e50; font-size: 16px;">
+                        <i class="fab fa-weixin" style="color:#07C160"></i> 关注微信订阅号「低空大白话」
+                    </p>
+                    <p style="margin: 0; font-size: 13px; color: #666;">获取中国低空经济全视角商业干货</p>
+                </div>
+                <button class="btn-secondary" style="width:100%; margin-top:20px;" @click="currentArticle = null">关闭阅读</button>
+            </div>
+        </div>
+
+        <div v-if="showCartModal" class="modal-overlay" @click.self="showCartModal = false">
+            <div class="modal-content">
+                <h2 style="margin-top:0; border-bottom:2px solid #f0f0f0; padding-bottom:15px; font-size: 22px;">
+                    <i class="fas fa-shopping-basket" style="color:var(--primary-blue)"></i> 采购清单
+                </h2>
+                <div v-if="cart.length === 0" style="color:#999; padding: 40px 0; text-align: center; font-size: 15px;">
+                    清单空空如也，快去空中商场添加所需装备吧！
+                </div>
+                <div v-else>
+                    <div v-for="(item, index) in cart" :key="index" class="cart-item">
+                        <span style="font-weight: 500; color: #333;">{{ item.name }}</span>
+                        <span style="font-weight:700; color:var(--primary-orange)">￥{{ item.price }}</span>
+                    </div>
+                    <div style="text-align: right; margin-top: 25px; font-size: 18px; font-weight: bold; background: #fff5f0; padding: 15px; border-radius: 8px;">
+                        总计结算: <span style="color:var(--primary-orange); font-size: 24px;">￥{{ totalCartPrice }}</span>
+                    </div>
+                    <button class="btn-orange" style="width:100%; margin-top:20px; font-size: 16px; padding: 12px;" @click="alertMsg('系统正在对接底层支付网关与订单中心...')">前往收银台结账</button>
+                </div>
+                <button class="btn-secondary" style="width:100%; margin-top:10px;" @click="showCartModal = false">关闭清单</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const { createApp, ref, reactive, computed, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                const tabs = [
+                    { id: 'home', icon: 'fas fa-newspaper', name: '低空探索' },
+                    { id: 'share', icon: 'fas fa-comments', name: '共享平台' },
+                    { id: 'store', icon: 'fas fa-store', name: '空中商场' },
+                    { id: 'fpv', icon: 'fas fa-microchip', name: 'FPV技术支持' }
+                ];
+                const activeTab = ref('home'); 
+                const activeShareTab = ref('lease'); 
+
+                // ====== 芝麻信用风控中枢 ======
+                const creditScore = ref(0);
+                const showCreditModal = ref(false);
+                const creditStatus = ref('idle');
+                let pendingAction = null;
+                let pendingData = null;
+
+                const checkCreditBeforeAction = (actionType, data = null) => {
+                    if (creditScore.value >= 650) {
+                        executeAction(actionType, data);
+                    } else {
+                        pendingAction = actionType;
+                        pendingData = data;
+                        creditStatus.value = 'idle';
+                        showCreditModal.value = true;
+                    }
+                };
+
+                const triggerCreditAuth = () => {
+                    pendingAction = null;
+                    creditStatus.value = 'idle';
+                    showCreditModal.value = true;
+                };
+
+                const startCreditAuth = () => {
+                    creditStatus.value = 'loading';
+                    setTimeout(() => {
+                        creditScore.value = 780;
+                        creditStatus.value = 'success';
+                    }, 1500); 
+                };
+
+                const resumePendingAction = () => {
+                    showCreditModal.value = false;
+                    if (pendingAction) {
+                        executeAction(pendingAction, pendingData);
+                        pendingAction = null; pendingData = null;
+                    }
+                };
+
+                const executeAction = (actionType, data) => {
+                    if (actionType === 'publishLease') {
+                        submitLease(); 
+                    } else if (actionType === 'rentDevice') {
+                        alertMsg(`凭借您的高分芝麻信用，已为您免除设备【${data}】的全额押金！\n正在调起电子租赁合同与实名认证通道...`);
+                    }
+                };
+
+                // ====== 数据流：低空探索 ======
+                const currentArticle = ref(null);
+                const articles = ref([
+                    { 
+                        id: 1, tag: '政策划重点', title: '《低空空域暂行办法》落地，B端怎么吃红利？', 
+                        summary: '别看那么多官样文章了！一句话：跨区飞行的“路权”打通了。',
+                        content: `<h1>低空空域终于迎来了大一统市场！</h1><p>以前咱们B端企业接个活儿，想弄几台植保机或者巡检机跨市飞一下，审批流程能跑断腿。各种文件交上去，等到黄花菜都凉了。</p><blockquote>划重点：这次的新政策，就是要把各个地方的“断头路”连起来，建立低空空域的大一统市场！</blockquote><p>未来你在手机终端上输入起降坐标和飞行轨迹，系统智能排雷防撞，几分钟就能拿到电子放飞批文。这对于干测绘、干巡检的飞手来说，效率是指数级的提升！</p>`
+                    },
+                    { 
+                        id: 2, tag: '搞钱思路', title: '5000亿规模的赛道，咱们在哪个生态位？', 
+                        summary: '别去卷几千块的航拍机了，这三个垂直赛道才是下半场的搞钱利器。',
+                        content: `<h1>别卷航拍了，看看新质生产力</h1><p>现在一提到无人机，很多人脑子里还是“买个大疆去三亚拍海景”。其实面向C端的玩具市场早就杀成红海了。</p><blockquote>大白话：真正的搞钱大头，在“新质生产力”这五个字里！</blockquote><p>我们梳理了目前利润最丰厚的三个B端赛道：第一，风电叶片及光伏面板的自动化巡检；第二，大型农场的多光谱数据采集；第三，消防救援现场的三维建模。踏踏实实考个证，或者开发一套行业软件，这才是正经出路。</p>`
+                    }
+                ]);
+
+                // ====== 数据流：共享平台 (圈内探讨) ======
+                const newPost = reactive({ title: '', content: '' });
+                const postList = ref([
+                    { id: 1, author: '资深行业推手', time: '15分钟前', title: '农业植保机按季度租赁的商业模式跑通了吗？', content: '最近在研究多光谱无人机的租赁服务，发现前端购机成本太高，想采用B2B的季度租赁模式打入东北农场，各位觉得现金流周转扛得住吗？', likes: 23, isLiked: false },
+                    { id: 2, author: '硬核FPV老炮', time: '1小时前', title: '穿越机在管道巡检中的 Betaflight 调参心得', content: '室内密闭管道飞行，最大的问题就是气流扰动导致的剧烈抖动。我建议把 Roll 的 P 值压低 10% 左右，同时加上双叶片螺旋桨，能有效过滤高频杂音。', likes: 45, isLiked: false }
+                ]);
+
+                // ====== 数据流：共享平台 (闲置租赁) ======
+                const newLease = reactive({ device: '', price: '', location: '' });
+                const leaseList = ref([
+                    { id: 1, device: '大疆 M300 RTK + 禅思 L1', title: '测绘级整机空闲，带全套电池和充电站，包技术指导。', price: '¥800/天', location: '杭州市 西湖区', owner: '测绘老刘', status: '空闲待租', tags: ['测绘雷达', '同城面交'], credit: true },
+                    { id: 2, device: '多光谱农业植保机 V2', title: '适合果园、大型农田数据采集，包含移动充电站。', price: '¥1500/周', location: '杭州市 余杭区', owner: '农林科技张总', status: '空闲待租', tags: ['农业植保', '支持开发票'], credit: false }
+                ]);
+
+                // ====== 数据流：空中商场 ======
+                const selectedCategory = ref('全部货品');
+                const categories = ['全部货品', '商用整机', 'FPV组件', '软件服务'];
+                const cart = ref([]);
+                const showCartModal = ref(false);
+                const products = ref([
+                    { id: 1, category: '商用整机', icon: 'fas fa-helicopter', name: '重载消防灭火集群无人机', desc: '单机载重50kg，支持破窗发射与灭火弹投掷，集群自组网控制。', price: 89999 },
+                    { id: 2, category: 'FPV组件', icon: 'fas fa-vr-cardboard', name: '大白话联名款 O4 高清图传眼镜', desc: '超低延迟，全视野包裹，专为复杂的 B 端巡检环境抗干扰设计。', price: 4599 },
+                    { id: 3, category: '软件服务', icon: 'fas fa-laptop-code', name: '空域轨迹协同规划 SaaS 年费', desc: 'API 接口直接对接到企业后台，提供秒级航线避障算力。', price: 12000 },
+                    { id: 4, category: '商用整机', icon: 'fas fa-satellite', name: '多光谱农林测绘一体机', desc: '厘米级 RTK 定位，一次起降完成百亩农田的数据建模。', price: 35000 }
+                ]);
+                const filteredProducts = computed(() => {
+                    if (selectedCategory.value === '全部货品') return products.value;
+                    return products.value.filter(p => p.category === selectedCategory.value);
+                });
+                const totalCartPrice = computed(() => cart.value.reduce((sum, item) => sum + item.price, 0));
+
+                // ====== 数据流：FPV技术支持 ======
+                const pid = reactive({ rollP: 42, pitchI: 48 });
+                const dronePos = reactive({ x: 130, y: 100 });
+                let angle = 0;
+                onMounted(() => {
+                    setInterval(() => {
+                        angle += 0.03;
+                        dronePos.x = 180 + Math.cos(angle) * 130;
+                        dronePos.y = 90 + Math.sin(angle) * 45;
+                    }, 35);
+                });
+
+                // ====== 交互绑定 ======
+                const alertMsg = (msg) => { alert('享翼系统提示：\n\n' + msg); };
+                const openArticle = (article) => { currentArticle.value = article; };
+                
+                const submitPost = () => {
+                    if (!newPost.title || !newPost.content) { alertMsg('探讨主题和内容缺一不可哦！'); return; }
+                    postList.value.unshift({ id: Date.now(), author: '享翼实名认证用户', time: '刚刚', title: newPost.title, content: newPost.content, likes: 0, isLiked: false });
+                    newPost.title = ''; newPost.content = ''; alertMsg('干货已成功分享至圈内！');
+                };
+
+                const submitLease = () => {
+                    if (!newLease.device || !newLease.price || !newLease.location) { alertMsg('请填写完整设备信息哦！'); return; }
+                    leaseList.value.unshift({
+                        id: Date.now(), device: newLease.device, title: '机主新上架的优质闲置资产，欢迎同城面交测试。',
+                        price: `¥${newLease.price}/天`, location: newLease.location, owner: '享翼机主', status: '空闲待租', tags: ['新上架'], credit: true
+                    });
+                    newLease.device = ''; newLease.price = ''; newLease.location = '';
+                    alertMsg('资产上架成功！有芝麻信用背书，设备流转更安全。');
+                };
+
+                const toggleLike = (post) => { post.isLiked = !post.isLiked; post.isLiked ? post.likes++ : post.likes--; };
+                const addToCart = (product) => { cart.value.push(product); };
+
+                return {
+                    tabs, activeTab, activeShareTab,
+                    creditScore, showCreditModal, creditStatus, checkCreditBeforeAction, startCreditAuth, resumePendingAction, triggerCreditAuth,
+                    newLease, leaseList, submitLease,
+                    currentArticle, articles, openArticle, newPost, postList, submitPost, toggleLike,
+                    categories, selectedCategory, filteredProducts, cart, showCartModal, addToCart, totalCartPrice,
+                    pid, dronePos, alertMsg
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
